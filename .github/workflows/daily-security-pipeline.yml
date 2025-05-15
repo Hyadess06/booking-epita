@@ -4,32 +4,14 @@ on:
   workflow_dispatch: # Manual trigger for testing
 
 jobs:
-  DependenciesAnalysis:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      
-      - name: Install OSV Scanner
-        run: |
-          curl -LO https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
-          chmod +x osv-scanner-linux-amd64
-          sudo mv osv-scanner-linux-amd64 /usr/local/bin/osv-scanner
+  osv-scan:
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.0.2"
+    with:
+      scan-args: |-
+        ./app --format json --output reports/osv-results.sarif
+    permissions:
+      security-events: write
 
-      - name: Run OSV Scanner
-        with:
-            scan-args: |-
-              --format json --output reports/osv-results.sarif ./app
-          run: |
-            mkdir -p reports
-            osv-scanner ${{ inputs.scan-args }}
-      
-      - name: Upload OSV Report to Security Dashboard
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: reports/osv-results.sarif
-          
   SourceCodeAnalysis:
     runs-on: ubuntu-latest
     container:
