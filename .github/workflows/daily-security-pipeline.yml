@@ -20,12 +20,12 @@ jobs:
           scan-args: |-
             --lockfile=app/gradle.lockfile
             --format=sarif
-            --output=reports/osv-results.sarif
+            --output=osv-results.sarif
       
       - name: Upload OSV Scanner results
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: reports/osv-results.sarif
+          sarif_file: osv-results.sarif
 
   SourceCodeAnalysis:
     runs-on: ubuntu-latest
@@ -38,10 +38,10 @@ jobs:
       - name: Run Semgrep Analysis
         run: |
           mkdir -p reports
-          semgrep --config=p/java --output=reports/semgrep-results.sarif --sarif .
+          semgrep --config=p/java --output=semgrep-results.sarif --sarif .
       
       - name: Upload Semgrep Report to Security Dashboard
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: reports/semgrep-results.sarif
+          sarif_file: semgrep-results.sarif
