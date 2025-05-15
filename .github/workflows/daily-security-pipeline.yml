@@ -18,11 +18,11 @@ jobs:
 
       - name: Run OSV Scanner
         with:
-          scan-args: |-
-            --format json --output reports/osv-results.sarif ./app
-        run: |
-          mkdir -p reports
-          osv-scanner ${{ inputs.scan-args }}
+            scan-args: |-
+              --format json --output reports/osv-results.sarif ./app
+          run: |
+            mkdir -p reports
+            osv-scanner ${{ inputs.scan-args }}
       
       - name: Upload OSV Report to Security Dashboard
         if: always()
