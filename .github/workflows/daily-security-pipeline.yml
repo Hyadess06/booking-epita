@@ -10,16 +10,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       
+      - name: Install OSV Scanner
+        run: |
+          curl -LO https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+          chmod +x osv-scanner-linux-amd64
+          sudo mv osv-scanner-linux-amd64 /usr/local/bin/osv-scanner
+      
       - name: Run OSV Scanner
-        uses: google/osv-scanner-action@v3
-        with:
-          path: ./
+        run: |
+          mkdir -p reports
+          osv-scanner --lockfile=./path/to/your/lockfile --json > reports/osv-results.sarif
       
       - name: Upload OSV Report to Security Dashboard
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: results.sarif
+          sarif_file: reports/osv-results.sarif
           
   SourceCodeAnalysis:
     runs-on: ubuntu-latest
@@ -31,10 +37,11 @@ jobs:
       
       - name: Run Semgrep Analysis
         run: |
-          semgrep --config=p/java --output=semgrep-results.sarif --sarif .
+          mkdir -p reports
+          semgrep --config=p/java --output=reports/semgrep-results.sarif --sarif .
       
       - name: Upload Semgrep Report to Security Dashboard
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: semgrep-results.sarif 
+          sarif_file: reports/semgrep-results.sarif
