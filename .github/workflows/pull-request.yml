@@ -1,0 +1,79 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at 00:00 UTC
+  workflow_dispatch:     # Manual trigger
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  DependenciesAnalysis:
+    permissions:
+      security-events: write
+    name: DependenciesAnalysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run OSV Scanner (Before PR)
+        uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
+        with:
+          scan-args: |
+            --lockfile=app/gradle.lockfile
+            --format=sarif
+            --output=reports/osv-results-before.sarif
+        continue-on-error: true
+
+      - name: Run OSV Scanner (After PR)
+        uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
+        with:
+          scan-args: |
+            --lockfile=app/gradle.lockfile
+            --format=sarif
+            --output=reports/osv-results-after.sarif
+        continue-on-error: true
+
+      - name: Compare Analysis Reports
+        run: |
+          mkdir -p reports
+          diff reports/osv-results-before.sarif reports/osv-results-after.sarif > reports/diff-report.txt || true
+
+      - name: Upload Differential Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: differential-osv-scan-report
+          path: reports/diff-report.txt
+
+  SourceCodeAnalysis:
+    permissions:
+      security-events: write
+    name: SourceCodeAnalysis
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep for Java (Baseline)
+        run: semgrep --config=p/java --sarif --output=reports/semgrep-results-before.sarif
+
+      - name: Run Semgrep for Java (After PR)
+        run: semgrep --config=p/java --sarif --output=reports/semgrep-results-after.sarif
+
+      - name: Compare Semgrep Reports
+        run: |
+          mkdir -p reports
+          diff reports/semgrep-results-before.sarif reports/semgrep-results-after.sarif > reports/semgrep-diff-report.txt || true
+
+      - name: Upload Differential Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: differential-semgrep-scan-report
+          path: reports/semgrep-diff-report.txt
