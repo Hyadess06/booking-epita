@@ -1,8 +1,6 @@
-name: Daily Security Pipeline 
+name: security-pipeline
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # Every day at midnight UTC
   workflow_dispatch: # Manual trigger for testing
 
 jobs:
