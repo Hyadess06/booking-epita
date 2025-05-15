@@ -1,4 +1,4 @@
-name: Daily Security Pipeline
+name: Daily Security Pipeline 
 
 on:
   schedule:
@@ -12,21 +12,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       
-      - name: Install OSV Scanner
-        run: |
-          curl -LO https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
-          chmod +x osv-scanner-linux-amd64
-          sudo mv osv-scanner-linux-amd64 /usr/local/bin/osv-scanner
-      
       - name: Run OSV Scanner
-        run: |
-          osv-scanner --lockfile=path/to/your/lockfile > osv-results.sarif
+        uses: google/osv-scanner-action@v3
+        with:
+          path: ./
       
       - name: Upload OSV Report to Security Dashboard
         if: always()
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: osv-results.sarif
+          sarif_file: results.sarif
           
   SourceCodeAnalysis:
     runs-on: ubuntu-latest
@@ -44,4 +39,4 @@ jobs:
         if: always()
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: semgrep-results.sarif
+          sarif_file: semgrep-results.sarif 
