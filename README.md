@@ -1,6 +1,6 @@
 # Booking App
 
-Tasks to solve this hands on:
+Tasks to solve this hands on: 
 
 - [ ] Enable HTTPS
 - [ ] Fix CSRF issue
