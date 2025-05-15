@@ -1,9 +1,6 @@
-name: Pull Request
+name: Pull Request Security Scan
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # Runs daily at 00:00 UTC
-  workflow_dispatch:     # Manual trigger
   pull_request:
     branches:
       - main
