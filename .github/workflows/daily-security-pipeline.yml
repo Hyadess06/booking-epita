@@ -1,4 +1,4 @@
-name: security-pipeline
+""name: security-pipeline
 
 on:
   workflow_dispatch: # Manual trigger for testing
@@ -12,18 +12,17 @@ jobs:
       
       - name: Install OSV Scanner
         run: |
-          echo "🔍 Downloading OSV Scanner..."
           curl -LO https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
           chmod +x osv-scanner-linux-amd64
           sudo mv osv-scanner-linux-amd64 /usr/local/bin/osv-scanner
-          echo "✅ OSV Scanner installed."
 
       - name: Run OSV Scanner
+        with:
+          scan-args: |-
+            --format json --output reports/osv-results.sarif ./app
         run: |
-          echo "🔍 Running OSV Scanner with format and output..."
           mkdir -p reports
-          osv-scanner --format json --output reports/osv-results.sarif ./app
-          echo "✅ Scan complete. SARIF report generated at reports/osv-results.sarif"
+          osv-scanner ${{ inputs.scan-args }}
       
       - name: Upload OSV Report to Security Dashboard
         if: always()
@@ -49,3 +48,4 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: reports/semgrep-results.sarif
+""
