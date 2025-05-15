@@ -19,7 +19,7 @@ jobs:
       - name: Run OSV Scanner
         run: |
           mkdir -p reports
-          osv-scanner --lockfile=./path/to/your/lockfile --json > reports/osv-results.sarif
+          osv-scanner --lockfile=./app/gradle.lockfile --json > reports/osv-results.sarif
       
       - name: Upload OSV Report to Security Dashboard
         if: always()
