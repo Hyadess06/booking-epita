@@ -1,4 +1,4 @@
-name: Daily Security Pipeline
+name: Daily Security Pipeline 
 
 on:
   schedule:
