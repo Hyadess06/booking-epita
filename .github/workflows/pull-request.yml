@@ -1,4 +1,4 @@
-name: Security Scan
+name: Pull Request
 
 on:
   schedule:
