@@ -6,7 +6,6 @@ permissions:
   contents: read
   security-events: write
 
-  
 on:
   workflow_dispatch: # Manual trigger for testing
 
@@ -14,15 +13,14 @@ jobs:
   osv-scan:
     uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
     with:
-          scan-args: |
-            --lockfile=app/gradle.lockfile
-            --format=sarif
-            --output=osv-results.sarif
+      scan-args: |-
+        --lockfile=app/gradle.lockfile
+        --format=sarif
+        --output=reports/osv-results.sarif
     permissions:
       security-events: write
       contents: read
       actions: read
-
 
   SourceCodeAnalysis:
     runs-on: ubuntu-latest
